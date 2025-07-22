@@ -19,16 +19,37 @@ pipeline {
                 sh '. venv/bin/activate && pip install -r requirements.txt'
             }
         }
-
         
-        stage('Print Build Info') {
+        stage('Build Docker Image') {
             steps {
-                echo "Build Number: ${env.BUILD_NUMBER}"
-                echo "Build Date: ${env.BUILD_DATE}"
-                echo "Jenkins URL: ${env.JENKINS_URL}"
-                echo "Build URL: ${env.BUILD_URL}"
+                script {
+                    sh """
+                        docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
+                    """
+                }
             }
         }
+
+        stage('Push to Docker Registry') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker logout
+                    """
+                }
+            }
+        }
+
+        stage('Print Build Info') {
+            steps {
+                echo "Docker Image: ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                echo "Build Date: ${BUILD_DATE}"
+                echo "Build Number: ${env.BUILD_NUMBER}"
+            }
+        }
+        
     }
 
     post {
