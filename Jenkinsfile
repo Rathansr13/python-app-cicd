@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         BUILD_DATE = "${new Date().format('yyyy-MM-dd')}"
+         DOCKER_IMAGE = 'myapp:latest'
+         BUILD_NUMBER = "6166122"
     }
 
     stages {
