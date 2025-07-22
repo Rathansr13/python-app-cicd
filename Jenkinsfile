@@ -3,12 +3,13 @@ pipeline {
 
     environment {
         BUILD_DATE = "${new Date().format('yyyy-MM-dd')}"
-        DOCKER_IMAGE = 'myapp'                // ✅ Removed ":latest"
+        DOCKER_USERNAME = "rathan13"
+        REPO_NAME = "myapp"                         // Name of your repo on Docker Hub
         BUILD_NUMBER = "6166122"
+        DOCKER_IMAGE = "${DOCKER_USERNAME}/${REPO_NAME}" // Full Docker image name
     }
 
     stages {
-
         stage('Checkout from Git') {
             steps {
                 git url: 'https://github.com/Rathansr13/python-app-cicd', branch: 'master'
@@ -49,7 +50,6 @@ pipeline {
                 echo "Build Number: ${env.BUILD_NUMBER}"
             }
         }
-
     }
 
     post {
