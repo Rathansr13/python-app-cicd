@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         BUILD_DATE = "${new Date().format('yyyy-MM-dd')}"
-         DOCKER_IMAGE = 'myapp:latest'
-         BUILD_NUMBER = "6166122"
+        DOCKER_IMAGE = 'myapp'                // ✅ Removed ":latest"
+        BUILD_NUMBER = "6166122"
     }
 
     stages {
@@ -21,13 +21,11 @@ pipeline {
                 sh '. venv/bin/activate && pip install -r requirements.txt'
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh """
-                        docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
-                    """
+                    sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -51,7 +49,7 @@ pipeline {
                 echo "Build Number: ${env.BUILD_NUMBER}"
             }
         }
-        
+
     }
 
     post {
