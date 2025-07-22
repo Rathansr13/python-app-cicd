@@ -34,11 +34,13 @@ pipeline {
         stage('Push to Docker Registry') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh """
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push rathan13/myapp:latest
-                        docker logout
-                    """
+                   sh """
+             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+             docker image tag myapp:latest rathan13/myapp:latest
+             docker push rathan13/myapp:latest
+             docker logout
+        """
+
                 }
             }
         }
