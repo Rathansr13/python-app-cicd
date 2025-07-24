@@ -41,16 +41,23 @@ pipeline {
                 }
             }
         }
-        stage('Push to ECR')
-        {
-             steps{
-                sh 'aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 906385056045.dkr.ecr.ap-northeast-1.amazonaws.com'
-                sh 'docker build -t python-app .'
-                sh 'docker tag python-app:latest 906385056045.dkr.ecr.ap-northeast-1.amazonaws.com/python-app:latest'
-                sh 'docker push 906385056045.dkr.ecr.ap-northeast-1.amazonaws.com/python-app:latest'
-             }
-
+        stage('Push to ECR') {
+    steps {
+        script {
+            sh '''
+            if ! command -v aws &> /dev/null
+            then
+                echo "AWS CLI not found! Please install it."
+                exit 1
+            fi
+            aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 906385056045.dkr.ecr.ap-northeast-1.amazonaws.com
+            docker build -t python-app .
+            docker tag python-app:latest 906385056045.dkr.ecr.ap-northeast-1.amazonaws.com/python-app:latest
+            docker push 906385056045.dkr.ecr.ap-northeast-1.amazonaws.com/python-app:latest
+            '''
         }
+    }
+}
 
         stage('Print Build Info') {
             steps {
